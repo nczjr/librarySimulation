@@ -30,9 +30,11 @@ start_link() ->
 init([]) ->
   Server = {gen_server_book, {gen_server_book, start, []},
         permanent, 2000, worker, [gen_server_book]},
-        Initializator = {library_initializator, {library_initializator, start,[]},
-        transient, 2000, worker, [library_initializator]},
-  Children = [Server, Initializator],
+  Initializator = {library_initializator, {library_initializator, start,[]},
+        permanent, 2000, worker, [library_initializator]},
+  Book = {book_handler, {book_handler, start,[]},
+        permanent, 2000, worker, [book_handler]},
+  Children = [Server,Book, Initializator],
   RestartStrategy = {one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.
 

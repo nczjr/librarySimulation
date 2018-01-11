@@ -13,7 +13,7 @@
 %%====================================================================
 
 start() ->
-  io:format("Initializator Start"),
+    io:format("Initializator Start~n"),
     P=spawn_link(fun addBooks/0),
     register(?MODULE,P),
     {ok,P}.

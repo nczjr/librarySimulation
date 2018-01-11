@@ -3,6 +3,8 @@
 
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3, start/0, add/2, delete/1, get/1, check/2]).
 -define(SERVER, ?MODULE).
+-record(book, {name, author, state = available}).
+
 
 start() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
@@ -13,30 +15,24 @@ check(Book, Who) -> gen_server:call(?MODULE, {check, Book, Who}).
 
 
 init([]) ->
-  io:format("Server Start"),
-
-    Library = dict:new(),
+    io:format("Server Start~n"),
+    Library = [],
     {ok, Library}.
 
 handle_call({add, Book, Who}, _From, Library) ->
-    NewLibrary = dict:append(Book, Who, Library),
+    Process_Pid = spawn(book_handler, start ,[]),
+    NewLibrary = lists:append(Library, [Process_Pid ! {self(),{add, Book, Who}}]),
     {reply, ok, NewLibrary};
 
 handle_call({delete, Book}, _From, Library) ->
-    NewLibrary = dict:erase(Book, Library),
+    NewLibrary = lists:delete(Book, Library),
     {reply, ok, NewLibrary};
 
 handle_call({get, Book}, _From, Library) ->
-    {reply, dict:find(Book, Library), Library};
+    {reply, lists:keyfind(Book#book.name,#book.name,Library), Library};
 
 handle_call({check, Book, Who}, _From, Library) ->
-	Response = case dict:is_key(Book, Library) of
-		true ->
-			lists:member(Who, dict:fetch(Book, Library));
-		false ->
-			{noKey, Book}
-	end,
-	{reply, Response, Library}.
+	{reply, lists:member(Who, dict:fetch(Book, Library)), Library}.
 
 handle_cast(_Message, Library) -> {noreply, Library}.
 handle_info(_Message, Library) -> {noreply, Library}.
