@@ -28,7 +28,13 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+  Server = {gen_server_book, {gen_server_book, start, []},
+        permanent, 2000, worker, [gen_server_book]},
+        Initializator = {library_initializator, {library_initializator, start,[]},
+        transient, 2000, worker, [library_initializator]},
+  Children = [Server, Initializator],
+  RestartStrategy = {one_for_one, 0, 1},
+  {ok, {RestartStrategy, Children}}.
 
 %%====================================================================
 %% Internal functions

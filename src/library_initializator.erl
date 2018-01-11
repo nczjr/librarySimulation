@@ -3,25 +3,29 @@
 %% @end
 %%%-------------------------------------------------------------------
 
--module(library_app).
-
--behaviour(application).
+-module(library_initializator).
 
 %% Application callbacks
--export([start/2, stop/1]).
+-export([start/0]).
 
 %%====================================================================
 %% API
 %%====================================================================
 
-start(_StartType, _StartArgs) ->
-    io:format("Start"),
-    library_sup:start_link().
+start() ->
+  io:format("Initializator Start"),
+    P=spawn_link(fun addBooks/0),
+    register(?MODULE,P),
+    {ok,P}.
 
-%%--------------------------------------------------------------------
-stop(_State) ->
-    ok.
 
+addBooks() ->
+    gen_server_book:add("1","cos"),
+    gen_server_book:add("2","cos"),
+    gen_server_book:add("2","cos"),
+    gen_server_book:add("2","cos"),
+    gen_server_book:add("2","cos"),
+    gen_server_book:add("2","cos").
 %%====================================================================
 %% Internal functions
 %%====================================================================
