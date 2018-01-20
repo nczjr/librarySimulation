@@ -20,8 +20,9 @@ init([]) ->
     {ok, Library}.
 
 handle_call({add, Book, Who}, _From, Library) ->
-    NewLibrary = lists:append(Library,[book_handler:init(Book, Who)]),
-    {reply, ok, NewLibrary};
+    NewBook = book_handler:init(Book, Who),
+    NewLibrary = lists:append(Library,[NewBook]),
+    {reply, NewBook,NewBook, NewLibrary};
 
 handle_call({delete, Book}, _From, Library) when record(Book,book) ->
     NewLibrary = lists:delete(Book, Library),
