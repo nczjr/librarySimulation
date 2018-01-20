@@ -28,8 +28,11 @@ addBooks() ->
     gen_server_book:add("6","cos"),
     gen_server_book:print(),
     gen_server_book:borrow("1"),
+    gen_server_book:print(),
+    gen_server_book:return("1"),
+    gen_server_book:print(),
+    gen_server_book:delete("1"),
     gen_server_book:print().
-
 
 
 getBook() ->

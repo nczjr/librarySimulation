@@ -1,7 +1,7 @@
 -module(gen_server_book).
 -behaviour(gen_server).
 
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3, start/0, add/2, borrow/1, get/1, print/0, check/2]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2, code_change/3, start/0, add/2, borrow/1, return/1, delete/1, print/0]).
 -define(SERVER, ?MODULE).
 -record(book, {name, author, state = available}).
 
@@ -10,8 +10,8 @@ start() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 add(Book, Who) -> gen_server:call(?MODULE, {add, Book, Who}).
 borrow(Book) -> gen_server:call(?MODULE, {borrow, Book}).
-get(Book) -> gen_server:call(?MODULE, {get, Book}).
-check(Book, Who) -> gen_server:call(?MODULE, {check, Book, Who}).
+return(Book) -> gen_server:call(?MODULE, {return, Book}).
+delete(Book) -> gen_server:call(?MODULE, {delete, Book}).
 print() -> gen_server:call(?MODULE, {print}).
 
 
@@ -28,7 +28,7 @@ display(Book) ->
 
 handle_call({print}, _From, Library) ->
     lists:foreach(fun display/1, Library),
-     {reply, ok  , Library};
+     {reply, ok, Library};
 
 
 handle_call({add, Book, Who}, _From, Library) ->
@@ -37,12 +37,10 @@ handle_call({add, Book, Who}, _From, Library) ->
     {reply, ok, NewLibrary};
 
     
-
 handle_call({borrow, Book}, _From, Library) ->
     
     Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
  		true ->
- 			% NewLibrary = lists:delete(Book, Library),
             BookToBorrow = lists:keyfind(Book, #book.name,Library),
             io:format("Poszukiwana ksiazka ~p ~n", [BookToBorrow]),
             NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:borrow_book(BookToBorrow));
@@ -54,11 +52,32 @@ handle_call({borrow, Book}, _From, Library) ->
     
     {reply, ok, NewLibrary};
 
-handle_call({get, Book}, _From, Library) ->
-    {reply, lists:any(fun(X) -> X#book.name == Book#book.name end,Library), Library};
+handle_call({return, Book}, _From, Library) ->
+     Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
+ 		true ->
+            BookToReturn = lists:keyfind(Book, #book.name,Library),
+            io:format("Zwracana ksiazka ~p ~n", [BookToReturn]),
+            NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:return_book(BookToReturn));
 
-handle_call({check, Book, Who}, _From, Library) ->
-	{reply, lists:member(Who, dict:fetch(Book, Library)), Library}.
+ 		false ->
+            NewLibrary = Library,
+ 			io:format("Nie mamy ksiazki o tytule ~p ~n", [Book])
+ 	end,
+    
+    {reply, ok, NewLibrary};
+
+handle_call({delete, Book}, _From, Library) ->
+	Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
+ 		true ->
+            BookToDelete = lists:keyfind(Book, #book.name,Library),
+            io:format("Usuwana ksiazka ~p ~n", [BookToDelete]),
+            NewLibrary = lists:delete(BookToDelete,Library);
+
+ 		false ->
+            NewLibrary = Library,
+ 			io:format("Nie mamy ksiazki o tytule ~p ~n", [Book])
+ 	end,
+    {reply, ok, NewLibrary}.
 
 handle_cast(_Message, Library) -> {noreply, Library}.
 handle_info(_Message, Library) -> {noreply, Library}.
