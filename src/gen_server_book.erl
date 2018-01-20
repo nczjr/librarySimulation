@@ -20,16 +20,15 @@ init([]) ->
     {ok, Library}.
 
 handle_call({add, Book, Who}, _From, Library) ->
-    Process_Pid = spawn(book_handler, start ,[]),
-    NewLibrary = lists:append(Library, [Process_Pid ! {self(),{add, Book, Who}}]),
+    NewLibrary = lists:append(Library,[book_handler:init(Book, Who)]),
     {reply, ok, NewLibrary};
 
-handle_call({delete, Book}, _From, Library) ->
+handle_call({delete, Book}, _From, Library) when record(Book,book) ->
     NewLibrary = lists:delete(Book, Library),
     {reply, ok, NewLibrary};
 
 handle_call({get, Book}, _From, Library) ->
-    {reply, lists:keyfind(Book#book.name,#book.name,Library), Library};
+    {reply, lists:any(fun(X) -> X#book.name == Book#book.name end,Library), Library};
 
 handle_call({check, Book, Who}, _From, Library) ->
 	{reply, lists:member(Who, dict:fetch(Book, Library)), Library}.
