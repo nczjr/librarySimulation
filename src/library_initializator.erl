@@ -20,18 +20,20 @@ start() ->
 
 
 addBooks() ->
-    {_,_,NewBook,_} = gen_server_book:add("1","cos"),
+    gen_server_book:add("1","cos"),
     gen_server_book:add("2","cos"),
     gen_server_book:add("3","cos"),
     gen_server_book:add("4","cos"),
     gen_server_book:add("5","cos"),
     gen_server_book:add("6","cos"),
-    getBook(NewBook).
+    gen_server_book:print(),
+    gen_server_book:borrow("1"),
+    gen_server_book:print().
 
 
 
-getBook(Book) ->
-    gen_server_book:delete(Book).
+getBook() ->
+    gen_server_book:delete(book_handler:init("1","cos")).
 %%====================================================================
 %% Internal functions
 %%====================================================================
