@@ -42,12 +42,12 @@ handle_call({borrow, Book}, _From, Library) ->
     Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
  		true ->
             BookToBorrow = lists:keyfind(Book, #book.name,Library),
-            io:format("Poszukiwana ksiazka ~p ~n", [BookToBorrow]),
+            io:format("Borrowed book ~p ~n", [BookToBorrow]),
             NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:borrow_book(BookToBorrow));
 
  		false ->
             NewLibrary = Library,
- 			io:format("Nie mamy ksiazki o tytule ~p ~n", [Book])
+ 			io:format("There's no such book in library ~p ~n", [Book])
  	end,
     
     {reply, ok, NewLibrary};
@@ -56,12 +56,12 @@ handle_call({return, Book}, _From, Library) ->
      Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
  		true ->
             BookToReturn = lists:keyfind(Book, #book.name,Library),
-            io:format("Zwracana ksiazka ~p ~n", [BookToReturn]),
+            io:format("Returned book ~p ~n", [BookToReturn]),
             NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:return_book(BookToReturn));
 
  		false ->
             NewLibrary = Library,
- 			io:format("Nie mamy ksiazki o tytule ~p ~n", [Book])
+ 			io:format("There's no such book in library ~p ~n", [Book])
  	end,
     
     {reply, ok, NewLibrary};
@@ -70,12 +70,12 @@ handle_call({delete, Book}, _From, Library) ->
 	Response = case lists:any(fun(X) -> X#book.name == Book end,Library) of
  		true ->
             BookToDelete = lists:keyfind(Book, #book.name,Library),
-            io:format("Usuwana ksiazka ~p ~n", [BookToDelete]),
+            io:format("Deleted book ~p ~n", [BookToDelete]),
             NewLibrary = lists:delete(BookToDelete,Library);
 
  		false ->
             NewLibrary = Library,
- 			io:format("Nie mamy ksiazki o tytule ~p ~n", [Book])
+ 			io:format("There's no such book in library ~p ~n", [Book])
  	end,
     {reply, ok, NewLibrary}.
 

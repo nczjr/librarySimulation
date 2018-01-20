@@ -14,12 +14,12 @@
 
 start() ->
     io:format("Initializator Start~n"),
-    P=spawn_link(fun addBooks/0),
+    P=spawn_link(fun initialize/0),
     register(?MODULE,P),
     {ok,P}.
 
 
-addBooks() ->
+initialize() ->
     gen_server_book:add("1","cos"),
     gen_server_book:add("2","cos"),
     gen_server_book:add("3","cos"),
@@ -35,8 +35,6 @@ addBooks() ->
     gen_server_book:print().
 
 
-getBook() ->
-    gen_server_book:delete(book_handler:init("1","cos")).
 %%====================================================================
 %% Internal functions
 %%====================================================================
