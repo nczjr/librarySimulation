@@ -14,12 +14,12 @@
 
 start() ->
     io:format("Initializator Start~n"),
-    P=spawn_link(fun initialize/0),
+    P=spawn_link(fun loop/0),
     register(?MODULE,P),
+    add_books(),
     {ok,P}.
 
-
-initialize() ->
+add_books() -> 
     gen_server_book:add("1","author"),
     gen_server_book:add("2","author"),
     gen_server_book:add("3","author"),
@@ -31,6 +31,11 @@ initialize() ->
     gen_server_book:add("9","author"),
     gen_server_book:add("10","author").
 
+loop() ->
+    receive 
+        _ -> io:format("s;s;")
+        
+    end.
 
 %%====================================================================
 %% Internal functions

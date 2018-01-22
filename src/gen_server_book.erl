@@ -5,7 +5,7 @@
 -define(SERVER, ?MODULE).
 -record(book, {name, author, state = available}).
 
-start() -> gen_server:start_link({global, ?MODULE}, ?MODULE, [], []).
+start() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 add(Book, Who) -> gen_server:call(?MODULE, {add, Book, Who}).
 borrow(Book) -> gen_server:call(?MODULE, {borrow, Book}).
