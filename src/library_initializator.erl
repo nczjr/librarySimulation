@@ -20,19 +20,16 @@ start() ->
 
 
 initialize() ->
-    gen_server_book:add("1","cos"),
-    gen_server_book:add("2","cos"),
-    gen_server_book:add("3","cos"),
-    gen_server_book:add("4","cos"),
-    gen_server_book:add("5","cos"),
-    gen_server_book:add("6","cos"),
-    gen_server_book:print(),
-    gen_server_book:borrow("1"),
-    gen_server_book:print(),
-    gen_server_book:return("1"),
-    gen_server_book:print(),
-    gen_server_book:delete("1"),
-    gen_server_book:print().
+    gen_server_book:add("1","author"),
+    gen_server_book:add("2","author"),
+    gen_server_book:add("3","author"),
+    gen_server_book:add("4","author"),
+    gen_server_book:add("5","author"),
+    gen_server_book:add("6","author"),
+    gen_server_book:add("7","author"),
+    gen_server_book:add("8","author"),
+    gen_server_book:add("9","author"),
+    gen_server_book:add("10","author").
 
 
 %%====================================================================
