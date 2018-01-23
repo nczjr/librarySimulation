@@ -32,6 +32,7 @@ init([]) ->
         permanent, 2000, worker, [gen_server_book]},
   Initializator = {library_initializator, {library_initializator, start,[]},
         permanent, 2000, worker, [library_initializator]},
+
 %   Client1 = {client1, {client, start, [client1]},
 %         permanent, 2000, worker, [client]},
 %   Client2 = {client2, {client, start, [client2]},
@@ -40,15 +41,8 @@ init([]) ->
 %         permanent, 2000, worker, [client]},
 %   Client4 = {client4, {client, start, [client4]},
 %         permanent, 2000, worker, [client]},
-Client1 = {client1, {client_simulator, start, [client1]},
-        permanent, 2000, worker, [client_simulator]},
-  Client2 = {client2, {client_simulator, start, [client2]},
-        permanent, 2000, worker, [client_simulator]},
-  Client3 = {client3, {client_simulator, start, [client3]},
-        permanent, 2000, worker, [client_simulator]},
-  Client4 = {client4, {client_simulator, start, [client4]},
-        permanent, 2000, worker, [client_simulator]},
-  Children = [Server, Initializator, Client1, Client2, Client3, Client4],
+
+  Children = [Server],
   RestartStrategy = {one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.
 
