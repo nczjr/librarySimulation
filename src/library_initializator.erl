@@ -8,15 +8,15 @@ start() ->
     {ok}.
 
 add_books() -> 
-    Books = [book_handler:init("1","author"),
-            book_handler:init("2","author"),
-            book_handler:init("3","author"),
-            book_handler:init("4","author"),
-            book_handler:init("5","author"),
-            book_handler:init("6","author"),
-            book_handler:init("7","author"),
-            book_handler:init("8","author"),
-            book_handler:init("9","author"),
-            book_handler:init("10","author")],
+    Books = [book_handler:init("book1","author1"),
+            book_handler:init("book2","author2"),
+            book_handler:init("book3","author3"),
+            book_handler:init("book4","author4"),
+            book_handler:init("book5","author5"),
+            book_handler:init("book6","author6"),
+            book_handler:init("book7","author7"),
+            book_handler:init("book8","author8"),
+            book_handler:init("book9","author9"),
+            book_handler:init("book10","author10")],
         lists:foreach(fun(X) -> gen_server_book:add(X) end,Books).
 

@@ -7,7 +7,7 @@ start(Number) ->
     Clients = lists:seq(1,Number),
     Pids = lists:map(fun(X) -> 
                     client:start(   
-                        lists:nth(random:uniform(length(Names)),Names)
+                        lists:nth(rand:uniform(length(Names)),Names)
                         ) end, Clients),
     lists:foreach(fun(X) -> X ! work end, Pids).
 

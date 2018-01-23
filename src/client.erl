@@ -16,7 +16,6 @@ init(Name) ->
 
 handle(Self) ->
     receive 
-        
         get_books ->
             Books = Self#client.books,
             io:format("Client ~w has: ~n", [Self#client.name]),
@@ -27,11 +26,12 @@ handle(Self) ->
             LibraryBooks = gen_server_book:get_books(),
                 case rand:uniform(3) of
                     1 -> 
-                        UpdatedSelf = random_return(Self, LibraryBooks);
+                        UpdatedSelf = random_return(Self);
                     _ -> 
                         UpdatedSelf = random_borrow(Self, LibraryBooks)
                 end,
                 self() ! work,
+                timer:sleep(5000),
                 handle(UpdatedSelf);
 
         {borrow_book, Book} ->
@@ -60,7 +60,7 @@ borrow(Self, Book) when is_record(Book, book) ->
 
 borrow(Self, _) -> handle(Self).
 
-random_return(Client, LibraryBooks) ->
+random_return(Client) ->
     case length(Client#client.books) of
         0 ->
             Client;
@@ -68,6 +68,7 @@ random_return(Client, LibraryBooks) ->
             Books = Client#client.books,
             Book = lists:nth(rand:uniform(length(Books)), Books), 
             New_books = lists:delete(Book, Books),
+            io:format("Client ~w is trying to return book: ~p~n", [Client#client.name,Book#book.name]),
             gen_server_book:return(Book#book.name),
             io:format("Client ~w returned book: ~p~n", [Client#client.name,Book#book.name]),
             UpdatedClient = Client#client{books = New_books},
@@ -75,15 +76,18 @@ random_return(Client, LibraryBooks) ->
     end.
 
 random_borrow(Client, LibraryBooks) ->
-Book = lists:nth(rand:uniform(length(LibraryBooks)), LibraryBooks), 
-                        Borrowed_book = gen_server_book:borrow(Book#book.name),
-                        case is_record(Borrowed_book,book) of
-                            true ->
-                                io:format("Client ~w borrowed book: ~p~n", [Client#client.name,Book#book.name]),
-                                Books = Client#client.books,
-                                UpdatedClient = Client#client{books = Books ++ [Borrowed_book]};
-                            false -> UpdatedClient = Client
-                        end.
+    Book = lists:nth(rand:uniform(length(LibraryBooks)), LibraryBooks), 
+    io:format("Client ~w is trying to borrow book: ~p~n", [Client#client.name,Book#book.name]),
+    Borrowed_book = gen_server_book:borrow(Book#book.name),
+    case is_record(Borrowed_book,book) of
+        true ->
+            io:format("Client ~w borrowed book: ~p~n", [Client#client.name,Book#book.name]),
+            Books = Client#client.books,
+            Client#client{books = Books ++ [Borrowed_book]};
+        false -> 
+            io:format("Client ~w didn't borrow book: ~p~n", [Client#client.name,Book#book.name]),
+            Client   
+    end.
 
 
 
