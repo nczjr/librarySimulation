@@ -5,7 +5,7 @@
 
 
 init(Name, Author) ->
-    io:format("Adding ~p ~p ~n", [Name,Author]),
+    io:format("Adding ~p by ~p ~n", [Name,Author]),
     #book{name = Name, author = Author}.
 
 borrow_book(Self) ->
