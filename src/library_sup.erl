@@ -41,8 +41,8 @@ init([]) ->
 %         permanent, 2000, worker, [client]},
 %   Client4 = {client4, {client, start, [client4]},
 %         permanent, 2000, worker, [client]},
-
-  Children = [Server],
+ Children = [Server],
+%   Children = [Server,Client1,Client2,Client3,Client4],
   RestartStrategy = {one_for_one, 0, 1},
   {ok, {RestartStrategy, Children}}.
 

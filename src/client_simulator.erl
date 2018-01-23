@@ -2,23 +2,24 @@
 -compile([export_all]).
 
 
-start(Name) ->
-     PID = client:start(Name),
-     gen_server_book:add_client(PID),
-     P=spawn_link(?MODULE, loop, []),
-     register(?MODULE,P),
-     work(PID),
-     {ok, PID}.
+start(Number) ->
+    Names = [jan,ula,kacper,radek,mirek,grzesiu,gocha,daniel],
+    Pids = add(Number,Names),
+    startWork(Pids).
+    % Clients = lists:seq(1,Number),
+    % Pids = lists:map(fun(X) -> [client:start(X)] end, Clients),
+    % io:format("~p", [Pids]),
+    % lists:foreach(fun(X) -> X ! work end, Pids).
 
-work(PID) ->
-    client:borrow_book("1"),
-    client:borrow_book("2"),
-    client:return_book("1").
+add(0,Names) -> [];
+add(N,Names) -> [client:start(lists:nth(random:uniform(length(Names)),Names))] ++ add(N-1,Names).
+
+startWork([]) -> io:format("wszystkie done");
+startWork([H|T]) -> H ! work,
+                startWork(T).
 
 
 
-    loop() ->
-    receive 
-        _ -> io:format("s;s;")
-        
-    end.
+    % Cl1 = client:start(chuj),
+    % Cl1 ! work.
+    

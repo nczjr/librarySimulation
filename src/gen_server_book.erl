@@ -1,7 +1,7 @@
 -module(gen_server_book).
 -behaviour(gen_server).
 
--export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2, start/0, add/2, add_client/1, borrow/1, return/1, delete/1, print/0]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3, terminate/2, start/0, add/2, add_client/1, get_books/0, borrow/1, return/1, delete/1, print/0]).
 -define(SERVER, ?MODULE).
 -record(book, {name, author, state = available}).
 
@@ -9,6 +9,7 @@ start() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 add(Book, Who) -> gen_server:call(?MODULE, {add, Book, Who}).
 add_client(PID) -> gen_server:call(?MODULE, {add_client, PID}).
+get_books() -> gen_server:call(?MODULE, {get_books}).
 borrow(Book) -> gen_server:call(?MODULE, {borrow, Book}).
 return(Book) -> gen_server:call(?MODULE, {return, Book}).
 delete(Book) -> gen_server:call(?MODULE, {delete, Book}).
@@ -40,17 +41,27 @@ handle_call({add_client, PID}, _From, {Library, Clients}) ->
     NewClients = lists:append(Clients,[PID]),
     {reply, ok, {Library, NewClients}};
 
+handle_call({get_books}, _From, {Library, Clients}) ->
+    {reply, Library, {Library, Clients}};
+
+
+
 handle_call({borrow, Book}, _From, {Library, Clients}) ->
     case lists:any(fun(X) -> X#book.name == Book end,Library) of
  		true ->
             BookToBorrow = lists:keyfind(Book, #book.name,Library),
-            io:format("Borrowed book ~p ~n", [BookToBorrow]),
-            NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:borrow_book(BookToBorrow)),
-            {reply, BookToBorrow, {NewLibrary, Clients}};
+            case BookToBorrow#book.state of
+                available ->
+                    io:format("Borrowed book ~p ~n", [BookToBorrow]),
+                    NewLibrary =lists:keystore(Book,#book.name,Library,book_handler:borrow_book(BookToBorrow)),
+                    {reply, BookToBorrow, {NewLibrary, Clients}};
+                _ -> 
+                    io:format("Book already borrowed~p ~n", [BookToBorrow]),
+                    {reply, not_found, {Library, Clients}}
+            end;
  		false ->
-            NewLibrary = Library,
  			io:format("There's no such book in library ~p ~n", [Book]),
-            {reply, not_found, {NewLibrary, Clients}}
+            {reply, not_found, {Library, Clients}}
  	end;
 
 handle_call({return, Book}, _From, {Library, Clients}) ->
